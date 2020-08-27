@@ -1,0 +1,33 @@
+
+web_server: 
+  bind: 0.0.0.0
+  port: 5050
+  web_ui: yes
+  
+schedules: 
+  - tasks: '*'
+    interval:
+      minutes: 60
+  
+tasks:
+  eztv:
+    rss: https://eztv.io/ezrss.xml
+    series:
+      - Lovecraft Country
+    quality: 720p
+  
+  argenteam:
+    rss: TOKEN
+    series:
+      - The 100
+    quality: 720p  
+
+    transmission:
+      host: HOSTNAME/IP
+      port: PORT
+      path: /downloads/complete   
+
+# CMD
+# flexget web passwd PASSWORD        
+# flexget check
+# flexget execute

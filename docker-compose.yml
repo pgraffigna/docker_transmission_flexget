@@ -1,0 +1,31 @@
+---
+version: "2.1"
+services:
+  transmission:
+  image: linuxserver/transmission
+  container_name: NAME
+  environment:
+    - PUID=UID
+    - PGID=GID
+    - TZ=America/Argentina/Buenos_Aires
+  volumes:
+    - /srv/dev-disk-by-label-datos/config:/config
+    - /srv/dev-disk-by-label-datos/torrents:/downloads
+  ports:
+    - 9091:9091
+    - 51413:51413
+    - 51413:51413/udp
+  restart: unless-stopped
+
+  flexget:
+  image: wiserain/flexget
+  volumes:
+    - /srv/dev-disk-by-label-datos/flexget:/config
+    - /srv/dev-disk-by-label-datos/torrents:/downloads
+  ports:
+    - 5050:5050
+  environment:
+    - TORRENT_PLUGIN=transmission
+  restart: unless-stopped
+  links:
+    - transmission
