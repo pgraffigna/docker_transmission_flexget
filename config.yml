@@ -34,4 +34,8 @@ tasks:
 # CMD
 # flexget web passwd PASSWORD        
 # flexget check
-# flexget execute
+# flexget --test execute
+# flexget daemon reload-config
+# flexget history
+# flexget series list
+# flexget series forget "SERIE"
