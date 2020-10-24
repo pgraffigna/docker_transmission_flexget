@@ -11,25 +11,41 @@ schedules:
 templates:
   transmission:
     transmission:
-      host: IP/HOSTNAME
-      port: PORT
+      host: 192.168.0.3
+      port: 9091
       include_subs: yes
       path: /downloads/complete
 
 tasks:
-  eztv:
-    rss: https://eztv.io/ezrss.xml
+  showRSS_Love:
+    rss: https://showrss.info/show/1338.rss
     template: transmission
     series:
       - Lovecraft Country
     quality: 720p
 
-  argenteam:
-    rss: ARGENTEAM_TOKEN
+  showRSS_Third:
+    rss: https://showrss.info/show/1348.rss
     template: transmission
     series:
-      - The 100
-    quality: 720p  
+      - The Third Day
+    quality: 720p
+
+  showRSS_Fargo:
+    rss: https://showrss.info/show/126.rss
+    template: transmission
+    quality: 720p
+    series:
+      - Fargo:
+          begin: S04E01
+          identified_by: ep
+
+  argenteam:
+    rss:  http://www.argenteam.net/feed/b91933232f4ac678904a607d590f4a32
+    template: transmission
+    series:
+      - The Walking Dead:World Beyond
+    quality: 720p
   
 # CMD
 # flexget web passwd PASSWORD        
