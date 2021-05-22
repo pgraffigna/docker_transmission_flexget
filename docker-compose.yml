@@ -3,13 +3,13 @@ version: "2.1"
 services:
   transmission:
     image: ghcr.io/linuxserver/transmission
-    container_name: trans-flex
+    container_name: transmission
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=America/Argentina/Buenos_Aires
-      - USER=$USER
-      - PASS=$PASS
+      - USER=webuser
+      - PASS=webpass
     volumes:
       - $HOME/transmission/config:/config
       - $HOME/transmission/torrents:/downloads
@@ -21,6 +21,7 @@ services:
 
   flexget:
     image: wiserain/flexget
+    container_name: flexget
     volumes:
       - $HOME/transmission/flexget:/config
       - $HOME/transmission/torrents:/downloads
@@ -31,3 +32,19 @@ services:
     restart: unless-stopped
     links:
       - transmission
+
+  samba:
+    image: dperson/samba
+    container_name: samba
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
+    restart: always
+    command: '-u "vagrant:vagrant" -s "flexget;/flexget;yes;yes;yes" -s "torrents;/torrents;yes;yes;yes" -p -S'
+    stdin_open: true
+    tty: true
+    ports:
+      - 139:139
+      - 445:445
+    volumes:
+      - $HOME/transmission/torrents:/torrents
+      - $HOME/transmission/flexget:/flexget
