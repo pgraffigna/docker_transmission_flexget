@@ -1,18 +1,26 @@
 ---
-version: "2.1"
+version: '3.7'
+
+networks:
+  media-net:
+    name: media-net
+    driver: bridge
+
 services:
   transmission:
-    image: ghcr.io/linuxserver/transmission
+    image: linuxserver/transmission
     container_name: transmission
+    networks:
+      - media-net
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/Argentina/Buenos_Aires
-      - USER=webuser
-      - PASS=webpass
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      USER: torrente
+      PASS: password
     volumes:
-      - $HOME/transmission/config:/config
-      - $HOME/transmission/torrents:/downloads
+      - ~/datos/transmission/config:/config
+      - ~/datos/transmission:/downloads
     ports:
       - 9091:9091
       - 51413:51413
@@ -20,31 +28,39 @@ services:
     restart: unless-stopped
 
   flexget:
-    image: wiserain/flexget
+    image: wiserain/flexget:3
     container_name: flexget
+    networks:
+      - media-net
     volumes:
-      - $HOME/transmission/flexget:/config
-      - $HOME/transmission/torrents:/downloads
+      - ~/datos/flexget/config:/config
+      - ~/datos/transmission:/downloads
+      - ~/datos/jellyfin/series:/storage
     ports:
       - 5050:5050
     environment:
-      - TORRENT_PLUGIN=transmission
-    restart: unless-stopped
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TORRENT_PLUGIN: ${TORRENT_PLUGIN}
+      FG_WEBUI_PASSWD: ${FG_WEBUI_PASSWD}
     links:
       - transmission
+    restart: unless-stopped  
 
-  samba:
-    image: dperson/samba
-    container_name: samba
-    environment:
-      - TZ=America/Argentina/Buenos_Aires
-    restart: always
-    command: '-u "vagrant:vagrant" -s "flexget;/flexget;yes;yes;yes" -s "torrents;/torrents;yes;yes;yes" -p -S'
-    stdin_open: true
-    tty: true
-    ports:
-      - 139:139
-      - 445:445
-    volumes:
-      - $HOME/transmission/torrents:/torrents
-      - $HOME/transmission/flexget:/flexget
+  jellyfin:
+      image: linuxserver/jellyfin
+      container_name: jellyfin-stack
+      networks:
+        - media-net
+      ports:
+        - 8096:8096
+      environment:
+        PUID: ${PUID}
+        PGID: ${PGID}
+        TZ: ${TZ}
+      volumes:
+        - ~/datos/jellyfin/config:/config
+        - ~/datos/jellyfin/media:/movies
+        - ~/datos/jellyfin/series:/tvshows
+      restart: unless-stopped  
+

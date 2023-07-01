@@ -9,49 +9,69 @@ schedules:
       minutes: 60
 
 templates:
-  transmission:
+  transmissionrpc:
     transmission:
-      host: 192.168.0.3
+      host: transmission
       port: 9091
-      include_subs: yes
-      path: /downloads/complete
+      username: torrente
+      password: "password"
+      
+  tv:
+    regexp:
+      reject:
+        - x265: {from: title}
+    series:
+      settings:
+        tv:
+          exact: yes
+          propers: 12 hours
+          quality: 720p
+      group:
+        - The Walking Dead:Dead City
+        - Silo:
+            begin: S01E10
+        - The Outsider
 
 tasks:
-  showRSS_Love:
-    rss: https://showrss.info/show/1338.rss
-    template: transmission
-    series:
-      - Lovecraft Country
-    quality: 720p
+  showrss:
+    rss: https://showrss.info/other/all.rss
+    priority: 1
+    all_series: yes
+    template: 
+      - tv
+      - transmissionrpc
+    set:
+      path: /downloads/complete
 
-  showRSS_Third:
-    rss: https://showrss.info/show/1348.rss
-    template: transmission
-    series:
-      - The Third Day
-    quality: 720p
-
-  showRSS_Fargo:
-    rss: https://showrss.info/show/126.rss
-    template: transmission
-    quality: 720p
-    series:
-      - Fargo:
-          begin: S04E01
-          identified_by: ep
-
-  argenteam:
-    rss:  http://www.argenteam.net/feed/b91933232f4ac678904a607d590f4a32
-    template: transmission
-    series:
-      - The Walking Dead:World Beyond
-    quality: 720p
+  showrss_outsider:
+    rss: https://showrss.info/show/1249.rss
+    template:
+      - tv 
+      - transmissionrpc
+    set:
+      path: /downloads/complete  
   
-# CMD
-# flexget web passwd PASSWORD        
-# flexget check
-# flexget --test execute
-# flexget daemon reload-config
-# flexget history
-# flexget series list
-# flexget series forget "SERIE"
+  showrss_silo:
+    rss: https://showrss.info/show/1675.rss
+    template:
+      - tv 
+      - transmissionrpc
+    set:
+      path: /downloads/complete
+
+  sort-series:
+    metainfo_series: yes
+    accept_all: yes
+    filesystem:
+      path: /downloads/complete
+      regexp: '.*\.(avi|mkv|mp4)$'
+      recursive: yes
+    template: tv
+    series:
+      settings:
+        group:
+          parse_only: yes
+    require_field: series_name
+    move: 
+      to: '/storage/{{series_name}}'  
+      rename: '{{series_name}} - S{{series_season|pad(2)}}E{{series_episode|pad(2)}}'
