@@ -33,7 +33,7 @@ services:
     networks:
       - media-net
     volumes:
-      - ~/datos/flexget/config:/config
+      - ~/datos/flexget/config:/config:rw
       - ~/datos/transmission:/downloads
       - ~/datos/jellyfin/series:/storage
     ports:
@@ -55,12 +55,16 @@ services:
       ports:
         - 8096:8096
       environment:
-        PUID: ${PUID}
-        PGID: ${PGID}
-        TZ: ${TZ}
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Argentina/Buenos_Aires
       volumes:
-        - ~/datos/jellyfin/config:/config
+        - ~/datos/jellyfin/config:/config:rw
         - ~/datos/jellyfin/media:/movies
         - ~/datos/jellyfin/series:/tvshows
       restart: unless-stopped  
 
+## cli
+# flexget daemon start -d --autoreload-config
+# flexget --test execute --tasks "remove stale torrents" --dump
+# flexget series forget "SERIE"

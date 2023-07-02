@@ -75,3 +75,22 @@ tasks:
     move: 
       to: '/storage/{{series_name}}'  
       rename: '{{series_name}} - S{{series_season|pad(2)}}E{{series_episode|pad(2)}}'
+
+  remove stale torrents:
+    from_transmission:
+      only_complete: yes
+      host: transmission
+      port: 9091
+      username: torrente
+      password: "password"
+    disable: [seen, seen_info_hash]
+    if:
+      - transmission_progress == 100: accept
+      - not transmission_seed_ratio_ok: reject
+      - not transmission_idle_limit_ok: reject
+    transmission:
+      host: transmission
+      port: 9091
+      username: torrente
+      password: "password"
+      action: purge
