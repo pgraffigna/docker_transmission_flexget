@@ -1,3 +1,6 @@
 # docker_transmission_flexget
 
-Docker-compose para configurar un media center usando Transmission + Flexget + Jellyfin.
+Repo con instrucciones para configurar un media server con Jellyfin con descargas por parte de Transmission y el stack sonarr + radarr + prowlarr para la gestion de la media y los indexadores.
+
+Tambien dejo una configuración alternativa para el uso de Flexget.
+

@@ -1,0 +1,70 @@
+---
+version: '3.7'
+
+networks:
+  media-net:
+    name: media-net
+    driver: bridge
+
+services:
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    networks:
+      - media-net
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      USER: torrente
+      PASS: password
+    volumes:
+      - ~/datos/transmission/config:/config
+      - ~/datos/transmission:/downloads
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+
+  flexget:
+    image: wiserain/flexget:3
+    container_name: flexget
+    networks:
+      - media-net
+    volumes:
+      - ~/datos/flexget/config:/config:rw
+      - ~/datos/transmission:/downloads
+      - ~/datos/jellyfin/series:/storage
+    ports:
+      - 5050:5050
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TORRENT_PLUGIN: ${TORRENT_PLUGIN}
+      FG_WEBUI_PASSWD: ${FG_WEBUI_PASSWD}
+    links:
+      - transmission
+    restart: unless-stopped  
+
+  jellyfin:
+      image: linuxserver/jellyfin
+      container_name: jellyfin-stack
+      networks:
+        - media-net
+      ports:
+        - 8096:8096
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=America/Argentina/Buenos_Aires
+      volumes:
+        - ~/datos/jellyfin/config:/config:rw
+        - ~/datos/jellyfin/media:/movies
+        - ~/datos/jellyfin/series:/tvshows
+      restart: unless-stopped  
+
+## cli
+# flexget daemon start -d --autoreload-config
+# flexget --test execute --tasks "remove stale torrents" --dump
+# flexget series forget "SERIE"

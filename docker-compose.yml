@@ -1,6 +1,5 @@
 ---
 version: '3.7'
-
 networks:
   media-net:
     name: media-net
@@ -13,11 +12,11 @@ services:
     networks:
       - media-net
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TZ: ${TZ}
-      USER: torrente
-      PASS: password
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+      - USER=torrente
+      - PASS=password
     volumes:
       - ~/datos/transmission/config:/config
       - ~/datos/transmission:/downloads
@@ -26,45 +25,97 @@ services:
       - 51413:51413
       - 51413:51413/udp
     restart: unless-stopped
-
-  flexget:
-    image: wiserain/flexget:3
-    container_name: flexget
+  
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
     networks:
       - media-net
-    volumes:
-      - ~/datos/flexget/config:/config:rw
-      - ~/datos/transmission:/downloads
-      - ~/datos/jellyfin/series:/storage
-    ports:
-      - 5050:5050
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
-      TORRENT_PLUGIN: ${TORRENT_PLUGIN}
-      FG_WEBUI_PASSWD: ${FG_WEBUI_PASSWD}
-    links:
-      - transmission
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - ~/datos/prowlarr/config:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    networks:
+      - media-net
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - ~/datos/radarr/config:/config
+      - ~/datos/jellyfin/media:/movies
+      - ~/datos/transmission/complete:/downloads
+    ports:
+      - 7878:7878
     restart: unless-stopped  
 
-  jellyfin:
-      image: linuxserver/jellyfin
-      container_name: jellyfin-stack
-      networks:
-        - media-net
-      ports:
-        - 8096:8096
-      environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=America/Argentina/Buenos_Aires
-      volumes:
-        - ~/datos/jellyfin/config:/config:rw
-        - ~/datos/jellyfin/media:/movies
-        - ~/datos/jellyfin/series:/tvshows
-      restart: unless-stopped  
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    networks:
+      - media-net
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - ~/datos/sonarr/config:/config
+      - ~/datos/jellyfin/series:/tvshows
+      - ~/datos/transmission/complete:/downloads
+    ports:
+      - 8989:8989
+    restart: unless-stopped
 
-## cli
-# flexget daemon start -d --autoreload-config
-# flexget --test execute --tasks "remove stale torrents" --dump
-# flexget series forget "SERIE"
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    networks:
+      - media-net
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=America/Argentina/Buenos_Aires
+    ports:
+      - 5055:5055
+    volumes:
+      - ~/datos/jellyseer:/app/config
+    restart: unless-stopped    
+
+  jellyfin:
+    image: linuxserver/jellyfin
+    container_name: jellyfin
+    networks:
+      - media-net
+    ports:
+      - 8096:8096
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - ~/datos/jellyfin/config:/config:rw
+      - ~/datos/jellyfin/media:/movies
+      - ~/datos/jellyfin/series:/tvshows
+    restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    networks:
+      - media-net
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=America/Argentina/Buenos_Aires
+    ports:
+      - ${PORT:-8191}:8191
+    restart: unless-stopped  
