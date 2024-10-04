@@ -25,7 +25,7 @@ services:
       - 51413:51413
       - 51413:51413/udp
     restart: unless-stopped
-  
+
   prowlarr:
     image: linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -56,7 +56,7 @@ services:
       - ~/datos/transmission/complete:/downloads
     ports:
       - 7878:7878
-    restart: unless-stopped  
+    restart: unless-stopped
 
   sonarr:
     image: linuxserver/sonarr:latest
@@ -75,8 +75,25 @@ services:
       - 8989:8989
     restart: unless-stopped
 
+  bazarr:
+    image: linuxserver/bazarr:latest
+    container_name: bazarr
+    networks:
+      - media-net
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - ~/datos/bazarr/config:/config
+      - ~/datos/jellyfin/media:/movies
+      - ~/datos/jellyfin/series:/tvshows
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: fallenbagel/jellyseerr:1.9.0
     container_name: jellyseerr
     networks:
       - media-net
@@ -87,10 +104,10 @@ services:
       - 5055:5055
     volumes:
       - ~/datos/jellyseer:/app/config
-    restart: unless-stopped    
+    restart: unless-stopped
 
   jellyfin:
-    image: linuxserver/jellyfin
+    image: linuxserver/jellyfin:10.9.8
     container_name: jellyfin
     networks:
       - media-net
@@ -107,7 +124,7 @@ services:
     restart: unless-stopped
 
   flaresolverr:
-    image: ghcr.io/flaresolverr/flaresolverr:latest
+    image: flaresolverr/flaresolverr:latest
     container_name: flaresolverr
     networks:
       - media-net
@@ -118,4 +135,7 @@ services:
       - TZ=America/Argentina/Buenos_Aires
     ports:
       - ${PORT:-8191}:8191
-    restart: unless-stopped  
+    restart: unless-stopped
+
+# cli
+# docker-compose up -d --force-recreate --no-deps --remove-orphans jellyseerr

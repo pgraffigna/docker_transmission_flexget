@@ -1,9 +1,9 @@
-web_server: 
+web_server:
   bind: 0.0.0.0
   port: 5050
   web_ui: yes
 
-schedules: 
+schedules:
   - tasks: '*'
     interval:
       minutes: 60
@@ -14,8 +14,8 @@ templates:
       host: transmission
       port: 9091
       username: torrente
-      password: "password"
-      
+      password: "PASSWORD"
+
   tv:
     regexp:
       reject:
@@ -37,7 +37,7 @@ tasks:
     rss: https://showrss.info/other/all.rss
     priority: 1
     all_series: yes
-    template: 
+    template:
       - tv
       - transmissionrpc
     set:
@@ -46,15 +46,15 @@ tasks:
   showrss_outsider:
     rss: https://showrss.info/show/1249.rss
     template:
-      - tv 
+      - tv
       - transmissionrpc
     set:
-      path: /downloads/complete  
-  
+      path: /downloads/complete
+
   showrss_silo:
     rss: https://showrss.info/show/1675.rss
     template:
-      - tv 
+      - tv
       - transmissionrpc
     set:
       path: /downloads/complete
@@ -72,8 +72,8 @@ tasks:
         group:
           parse_only: yes
     require_field: series_name
-    move: 
-      to: '/storage/{{series_name}}'  
+    move:
+      to: '/storage/{{series_name}}'
       rename: '{{series_name}} - S{{series_season|pad(2)}}E{{series_episode|pad(2)}}'
 
   remove stale torrents:

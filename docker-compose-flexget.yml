@@ -45,7 +45,7 @@ services:
       FG_WEBUI_PASSWD: ${FG_WEBUI_PASSWD}
     links:
       - transmission
-    restart: unless-stopped  
+    restart: unless-stopped
 
   jellyfin:
       image: linuxserver/jellyfin
@@ -62,7 +62,7 @@ services:
         - ~/datos/jellyfin/config:/config:rw
         - ~/datos/jellyfin/media:/movies
         - ~/datos/jellyfin/series:/tvshows
-      restart: unless-stopped  
+      restart: unless-stopped
 
 ## cli
 # flexget daemon start -d --autoreload-config
