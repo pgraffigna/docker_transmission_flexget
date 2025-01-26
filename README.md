@@ -1,6 +1,6 @@
 # docker_transmission_flexget
 
-Repo con instrucciones para configurar un media server con Jellyfin con descargas por parte de Transmission y el stack sonarr + radarr + prowlarr +bazarr para la gestion de la media y los indexadores.
+Repo con instrucciones para configurar un media server con Jellyfin con descargas por parte de Transmission y el stack sonarr + radarr + prowlarr + bazarr para la gestion de la media y los indexadores asi como homarr para crear un dashboard para fácil acceso a todos los servicios.
 
 Tambien dejo una configuración alternativa para el uso de Flexget.
 
@@ -27,3 +27,4 @@ docker-compose up -d
 * docker-compose con configuracion para usar flexget como gestor de peliculas/series a descargar.
 * archivo de configuracion de flexget.
 * archivo env de ejemplo.
+* archivo de configuración para homarr con sitios ya configurados.

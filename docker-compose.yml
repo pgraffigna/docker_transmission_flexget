@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: linuxserver/radarr:latest
+    image: linuxserver/radarr:version-5.15.1.9463
     container_name: radarr
     networks:
       - media-net
@@ -59,7 +59,7 @@ services:
     restart: unless-stopped
 
   sonarr:
-    image: linuxserver/sonarr:latest
+    image: linuxserver/sonarr:4.0.11
     container_name: sonarr
     networks:
       - media-net
@@ -93,7 +93,7 @@ services:
     restart: unless-stopped
 
   jellyseerr:
-    image: fallenbagel/jellyseerr:1.9.0
+    image: fallenbagel/jellyseerr:2.0.0
     container_name: jellyseerr
     networks:
       - media-net
@@ -107,7 +107,7 @@ services:
     restart: unless-stopped
 
   jellyfin:
-    image: linuxserver/jellyfin:10.9.8
+    image: linuxserver/jellyfin:10.10.3
     container_name: jellyfin
     networks:
       - media-net
@@ -134,8 +134,21 @@ services:
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=America/Argentina/Buenos_Aires
     ports:
-      - ${PORT:-8191}:8191
+      - 8191:8191
     restart: unless-stopped
 
-# cli
-# docker-compose up -d --force-recreate --no-deps --remove-orphans jellyseerr
+  homarr:
+    image: ghcr.io/ajnart/homarr:latest
+    container_name: homarr
+    networks:
+      - media-net
+    restart: unless-stopped
+    volumes:
+      - ~/datos/homarr/configs:/app/data/configs
+      - ~/datos/homarr/icons:/app/public/icons
+      - ~/datos/homarr/data:/data
+      - ~/datos/homarr/imgs/backgrounds:/app/public/imgs/backgrounds
+    ports:
+      - 7575:7575
+    environment:
+      - TZ=America/Argentina/Buenos_Aires
